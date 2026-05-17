@@ -57,7 +57,12 @@ e altri.
 
 Set estende Collection e introduce il concetto di insieme (senza duplicati). L'interfaccia di accesso è simile, tuttavia add() e i costruttori devono accertarsi di non inserire/avere duplicati all'interno del Set e equals adotta il significato matematico di uguaglianza insiemistica (∀x ∈ S1, x ∈ S2 e viceversa).
 
-SortedSet estende a sua volta Set e aggiunge il concetto di ordinamento fra gli elementi, che devono necessariamente estendere Comparable\<T\> e quindi implementare compareTo(). Questa collection aggiunge metodi che sfruttano l'ordinamento degli elementi, come first(), last() o subSet().
+SortedSet estende a sua volta Set e aggiunge il concetto di ordinamento fra gli elementi, che devono necessariamente estendere Comparable\<T\> e quindi implementare compareTo() (o deve essere fornito un Comparator per poterli confrontare). Questa collection aggiunge anche i seguenti metodi:
+- **first()**: restituisce il primo elemento del Set
+- **last()**: restituisce l'ultimo elemento del Set
+- **headSet()**: restituisce un sottoset contenente solo gli elementi minori di quello dato
+- **subSet()**: restituisce un sottoset contenente gli elementi compresi tra i due dati
+- **tailSet()**: restituisce un sottoset contenente gli elementi maggiori di quello dato
 
 ### List\<T\>
 
@@ -77,12 +82,57 @@ L'interfaccia Map non deriva da Collection, in quanto questa struttura è una **
 
 La tabella è composta da **associazioni chiave-valore**. In altre parole ogni riga è composta da un valore associato ad un identificatore detto chiave, che è univoco. 
 
-L'accesso ai valori non è più sequenziale, scorrendo tutti i valori della struttura, ma bensì **casuale**, **accedendo al valore direttamente tramite la sua chiave**. Ciò è reso possibile da funzioni matematiche (funzioni hash) che creano una corrispondenza tra chiavi e valori in modo che, data una chiave, viene restituita la posizione dell'elemento in tabella.
+L'accesso ai valori non è più sequenziale, scorrendo tutti i valori della struttura, ma bensì **casuale**, **accedendo al valore direttamente tramite la sua chiave**. Questo tipo di accesso è reso possibile in due modi differenti:
+- funzioni hash (HashMap): funzioni matematiche che mettono in corrispondenza chiavi e valori
+- indici: si associa ad ogni chiave e il rispettivo valore un indice che facilita la ricerca
+
+![Tipologie di mappe](images/collection-map-types.png);
 
 L'interfaccia di accesso alla collection prevede i seguenti metodi:
 - **put()**: permette di inserire una nuova riga nella tabella
 - **get()**: permette di accedere ad una riga specificando la chiave
 - **containsKey()**: ricerca nella tabella se è presente la chiave specificata
 - **containsValue()**: ricerca nella tabella se è presente il valore specificato
+
+Esistono poi alcuni metodi che permettono di collegare le mappe alle altre strutture derivate da collection:
+- **keySet()**: restituisce tutte le chiavi della mappa. Siccome le chiavi sono univoche viene restituito un Set
+- **values()**: restituisce tutti i valori della mappa. Siccome i valori possono essere anche duplicati, il tipo di ritorno è Collection, in modo da non fare alcuna ipotesi
+- **entrySet()**: restituisce tutte le coppie chiave-valore della tabella. Per poter essere memorizzate in un unico oggetto è stata creata l'interfaccia **Entry**, poi implementata da **AbstractMap.SimpleEntry** e **AbstractMap.SimpleImmutableEntry**, che contiene al suo interno la chiave e il valore associato.
+
+### SortedMap\<K, V\>
+
+Come SortedSet per Set, SortedMap estende Map e introduce il concetto dell'ordinamento delle righe tramite le chiavi, che devono implementare Comparable\<K\> (o avere fornito un Comparator per confrontarle).
+Come nei Set vengono aggiunti i seguenti metodi:
+- **firstKey()**: restituisce la prima chiave della mappa
+- **lastKey()**: restituisce l'ultima chiave della mappa
+- **headMap()**: restituisce una sottomappa ordinata contenente le chiavi minori di quella data
+- **subMap()**: restituisce una sottomappa ordinata contenente le chiavi comprese tra le due date
+- **tailMap()**: restituisce una sottomappa ordinata contenente le chiavi maggiori di quella data
+
+### Libreria Collection
+
+La libreria Collection offre alcuni metodi statici per poter operare sulle collezioni. La libreria include:
+- algoritmi polimorfi per **ordinamento, ricerca binaria, ricerca min/max e riempimento** come per i metodi sort() e binarySearch(). In questo caso i metodi sono **applicabili solamente alle liste**, in quanto sono le uniche che hanno con sè il concetto di posizione, necessario per poter ordinare o cercare elementi.
+- **wrapper** che permettono di **incapsulare una collezione in un'altra**.
+- metodi per **ottenere collezioni vuote**, come emptyList(), emptySet(), emptyMap().
+
+## 3. Le implementazioni delle interfacce
+
+![Tipologie di mappe](images/collection-implementation.png);
+
+Per ogni interfaccia sono fornite più di una implementazione, tutte pensate per poter modificare il contenuto una volta inserito. Le implementazioni principali sono:
+- **Set**: HashSet, TreeSet, LinkedHashSet, EnumSet
+- **List**: ArrayList, LinkedList
+- **Map**: HashMap, TreeMap, LinkedHashMap, EnumMap
+- **Queue**: ArrayBlockingQueue, PriorityQueue, LinkedList
+- **Deque**: ArrayDeque, LinkedList
+
+Le implementazioni immutabili, per cui gli elementi inseriti non possono poi essere modificati, sono fornite tramite i metodi factory List.of(), Set.of() ecc.
+
+### Regole sull'utilizzo
+
+Per **Set e Map**. Se si ha bisogno dell'ordinamento, utilizzare le implementazioni **TreeMap** e **TreeSet**, che implementano SortedMap e SortedSet. Se invece non si ha bisogno di ordinamento, **HashMap** e **HashSet** sono più efficienti e in quel caso consigliati. <br> Se invece serve un ordine di iterazione predicibile (voglio sapere a priori in che ordine sono gli elementi) utilizzare **LinkedHashSet** e **LinkedHashMap**, che essendo linked per ogni elemento hanno un puntatore a quello precedente e quello successivo. Se un elemento viene inserito più di una volta, la sua posizione rimane quella del primo inserimento. <br> Se le chiavi della mappa o gli elementi del set sono appartenenti ad un Enum, utilizzare **EnumSet** o **EnumMap**. Qua l'ordine di iterazione rispecchia l'ordine degli elementi nell'enum.
+
+Per **List**. Normalmente conviene utilizzare **ArrayList** perchè realizzata su un array e con tempo di accesso costante grazie al metodo get(index). Se invece le operazioni da effettuare sono pricipalmente inserimento in testa o eliminazione di elementi al centro della lista meglio utilizzare **LinkedList**
 
 
