@@ -129,10 +129,74 @@ Per ogni interfaccia sono fornite più di una implementazione, tutte pensate per
 
 Le implementazioni immutabili, per cui gli elementi inseriti non possono poi essere modificati, sono fornite tramite i metodi factory List.of(), Set.of() ecc.
 
-### Regole sull'utilizzo
+## 4. Regole sull'utilizzo
+
+### Scelta dell'implementazione corretta
 
 Per **Set e Map**. Se si ha bisogno dell'ordinamento, utilizzare le implementazioni **TreeMap** e **TreeSet**, che implementano SortedMap e SortedSet. Se invece non si ha bisogno di ordinamento, **HashMap** e **HashSet** sono più efficienti e in quel caso consigliati. <br> Se invece serve un ordine di iterazione predicibile (voglio sapere a priori in che ordine sono gli elementi) utilizzare **LinkedHashSet** e **LinkedHashMap**, che essendo linked per ogni elemento hanno un puntatore a quello precedente e quello successivo. Se un elemento viene inserito più di una volta, la sua posizione rimane quella del primo inserimento. <br> Se le chiavi della mappa o gli elementi del set sono appartenenti ad un Enum, utilizzare **EnumSet** o **EnumMap**. Qua l'ordine di iterazione rispecchia l'ordine degli elementi nell'enum.
 
 Per **List**. Normalmente conviene utilizzare **ArrayList** perchè realizzata su un array e con tempo di accesso costante grazie al metodo get(index). Se invece le operazioni da effettuare sono pricipalmente inserimento in testa o eliminazione di elementi al centro della lista meglio utilizzare **LinkedList**
 
+### Costruzione
+
+Per ogni collection sono disponibili tre costruttori:
+- un **costruttore con zero argomenti** che crea una collezione vuota e modificabile
+- un **costruttore per copia** che accetta come argomento un'altra collection e che ne fa la copia, anche questa modificabile
+- I metodi factory **List.of, Set.of etc.** che creano una collection popolata e immutabile
+
+Di seguito sono riportati alcuni esempi di costruzione di collezioni
+```java
+//Costruzione lista vuota e aggiunta valori
+
+List<String> l1 = new LinkedList<String>(); 
+l1.add("Bologna"); l1.add("Modena"); l1.add("Parma");
+
+//Costruzione lista immutabile
+List<String> l2 = List.of("Bologna", "Modena", "Parma");
+```
+
+```java
+//Costruzione Set vuoti e aggiunta valori
+
+Set<String> s1 = new HashSet<String>();
+s1.add("Bologna"); s1.add("Modena"); s1.add("Parma");
+
+Set<String> s2 = new TreeSet<String>(); //ordinato
+s2.add("Piacenza"); s2.add("Ferrara"); s2.add("Rimini");
+
+//Costruzione di Set immutabili
+Set<String> s1 = Set.of("Bologna", "Modena", "Parma");
+
+//Non esiste la factory per SortedSet si risolve in questo modo
+Set<String> s2 = new TreeSet<String>(Set.of(...)); 
+```
+
+```java
+//Costruzione di mappe vuote e agggiunta valori
+
+Map<String, Integer> m1 = new HashMap<String, Integer>();
+m1.add("Bologna", 395416); m1.add("Modena", 189013); m1.add("Parma", 200455);
+
+Map<String, Integer> m2 = new TreeMap<String, Integer>();
+m2.add("Bologna", 395416); m2.add("Modena", 189013); m2.add("Parma", 200455);
+
+//Costruzione di mappe immutabili
+Map<String, Integer> m1 = Map.of(
+    "Bologna", 395416,
+    "Modena", 189016,
+    "Parma", 200455
+);
+
+//Non esiste la factory per SortedMap, si risolve in questo modo
+Map<String, Integer> m2 = new TreeMap<String, Integer>(Map.of(...));
+```
+
+#### NOTA BENE: le implementazione di List, Set e Map per le costruzioni tramite metodi factory non sono le stesse di quelle per le liste modificabili.**
+
+Inoltre, se i tipi generici degli elementi da inserire nella collection sono già stati denotati all'inizio della dichiarazione di variabile, possono essere omessi nella new sostituendoli con il **diamond operator** `<>`. Questo equivale a dire "è lo stesso tipo che ho scritto prima dell'uguale"
+
+```java
+List<String> l1 = new List<>();
+Map<String, Integer> m1 = new Map<>();
+```
 
