@@ -200,3 +200,55 @@ List<String> l1 = new List<>();
 Map<String, Integer> m1 = new Map<>();
 ```
 
+### Vincoli delle collezioni immutabili
+
+Nelle implementazioni delle collezioni immutabili ci sono alcune caratteristiche da tenere a mente. Le principali sono:
+- I metodi **add, put e remove**, che servono per modificare una collection, **lanciano eccezione** `UnsupportedOperationException`
+- Non sono accettati **elementi/chiavi null**
+- Lo **scorrimento degli elementi** può **non essere nello stesso ordine** dell'inserimento
+- Le **implementazioni sono value-based**, ossia **la factory sceglie se creare un nuovo oggetto o restituirne uno presente** in base ai valori presenti al suo interno. Perciò confronti come l1 == l2, che controlla se le due variabili puntano allo stesso oggetto, può dare risultati imprevedibili.
+
+## 5. Gli iteratori
+
+Dal grafico nella sezione 2 si può vedere come in realtà anche l'interfaccia Collection\<T\> deriva da un'altra interfaccia: **Iterable\<T\>**, che esprime un'entità sulla quale è possibile iterare tramite un ciclo for-each.<br> L'idea alla base è che ogni entità che implementa Iterable (ogni collection nel nostro caso) sa come navigare dentro se stessa. Tramite il metodo iterator() l'entità è in grado di produrre un componente, chiamato iteratore, che permette di scorrere via via tutti gli elementi al suo interno.
+
+Il motivo per cui si usano gli iteratori e non gli indici come per gli array è perchè in molte collection il concetto di indice e in generale di sequenza non esiste. L'iteratore è la soluzione a questo problema perchè estrae un elemento alla volta dall'entità e garantisce che questo venga considerato soltanto una volta.
+Di norma lo sviluppatore utilizza gli iteratori indirettamente, tramite il ciclo for-each. Tuttavia è possibile anche utilizzarlo direttamente tramite i metodi che mette a disposizione.
+
+Un iteratore implementa sempre l'interfaccia Iterator\<T\>. Questa interfaccia definisce tre metodi:
+- next(): deve fornire il prossimo elemento della sequenza
+- hasNext(): deve controllare che la sequenza abbia al suo interno altri elementi o meno
+- remove(): deve rimuovere dalla sequenza l'ultimo elemento restituito con next(). A differenza degli altri due questo è un metodo opzionale, inutile infatti nel caso di entità immutabili. <br> Nel caso non lo si voglia implementare basta inserire al suo interno `throw new UnsupportedOperationException()` (le classi del JCF lo hanno implementato)
+
+Dal pezzo di codice sottostante si può vedere come funziona quindi un ciclo for-each.
+```java
+for(T x : collezione) {
+    //operazioni su x
+}
+
+for(Iterator<T> i = collezione.iterator(); i.hasNext()) {
+    //operazioni su x = i.next()
+}
+```
+
+Con un iteratore quindi si può **scorrere una collezione per accedere agli elementi** e, se questa è modificabile, **modificare il contenuto degli stessi**. **NON** si può **modificare la collezione aggiungengo/togliendo elementi**, operazione che causa eccezione `ConcurrentModificationExpection`. Questa operazione infatti romperebbe sotto l'iteratore che non riesce a gestire modifiche alla struttura durante lo scorrimento.
+
+### Iteratori e mappe
+
+Gli iteratori navigano collezioni di elementi, contenitori **monodimensionali**. Non possono perciò essere utilizzati direttamente sulle mappe, in quanto quelle sono collezioni bidimensionali (chaive + valore). Tuttavia si può usare un iteratore per scorrere porzioni della mappa, come il Set delle chiavi generato con keySet() o la collection di valori generata con values(). Inoltre tramite entrySet(), che restituisce un Set di Entry, si può iterare sulle righe della mappa.
+
+```java
+Map<String, Integer> people = Map.of("Anna", 21, "Piero", 25, "Silvia", 43, "Guido", 56);
+
+//scorrimento chiavi con keySet
+for(String name : people.keySet()) {...}
+
+//scorrimento valori con values
+for(int age : people.values()) {...}
+
+//righe mappa
+for(Entry row : people.entrySet()) {
+    System.out.println(row); //stampa nel formato chiave=valore
+}
+```
+
