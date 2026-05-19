@@ -251,4 +251,35 @@ for(Entry row : people.entrySet()) {
     System.out.println(row); //stampa nel formato chiave=valore
 }
 ```
+## 6. Conversioni fra collection
 
+A volte può essere necessario dover **convertire una struttura dati** contenente alcuni elementi in una di altro tipo **conservando il contenuto**. A questo scopo il JCF adotta vari approcci:
+- Tra i costruttori delle classi collection o i metodi factory delle versioni immutabili ne esiste uno che **prende in ingresso un'altra struttura** appoggiandosi all'interfaccia **Collection**.
+- Tra i metodi delle varie collection ce ne sono vari nella forma **toSomething()** che convertono la struttura in quella specificata da Something
+
+Entrambi i metodi **creano una nuova struttura** tramite il metodo di **copia shallow**, non duplicando quindi anche il contenuto ma **utilizzando gli stessi oggetti dell'originale**. Si hanno quindi **due strutture separate** che però **puntano agli stessi oggetti**. 
+
+Il caso degli array è particolare e per questo separato dalle collection. La classe **Arrays** infatti fornisce **metodi statici** per **convertire un array nei vari tipi** di collection asNomeCollection(), e **ogni collection ha il metodo toArray()** che compie l'operazione inversa.
+
+Di seguito alcuni esempi per chiarire i concetti:
+```java
+//Costruzione di un Set partendo da una List
+List<String> l1 = List.of("Pippo", "Pluto", "Paperino", "Topolino");
+Set<String> s1 = new HashSet<>(l1);
+
+//La conversione si può fare tra collection dello stesso tipo 
+// ma con diverse proprietà di modifica
+List<String> l1 = List.of("Pippo", "Pluto", "Paperino", "Topolino");
+List<String> l2 = new ArrayList<>(l1); //l2 è modificabile
+
+//o dalla versione senza ordinamento a quella con (keySet ritorna un Set non un SortedSet)
+SortedSet<String> keys = new TreeSet<>(map.keySet());
+
+//Conversione da e verso array
+List<String> l1 = List.of("Pippo", "Pluto", "Paperino", "Topolino");
+String[] arr1 = l1.toArray(new String[0]) //l'argomento va specificato per far capire al metodo che tipo di array produrre
+
+List<String> l2 = Arrays.asList(arr1);
+```
+
+## 7. Esempio: ordinamento e ricerca
