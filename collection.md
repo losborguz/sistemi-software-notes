@@ -281,5 +281,3 @@ String[] arr1 = l1.toArray(new String[0]) //l'argomento va specificato per far c
 
 List<String> l2 = Arrays.asList(arr1);
 ```
-
-## 7. Esempio: ordinamento e ricerca
