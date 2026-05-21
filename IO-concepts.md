@@ -37,3 +37,62 @@ Le classi astratte alla base del package sono 4: **InputStream** e **OutputStrea
 ![Diagramma classi base IO](images/IO-base-classes.png)
 
 Per l'approccio che si è seguito queste classi sono fondamentali perchè costituiscono il nucleo della "cipolla" che si crea inglobando implementazioni di stream sempre più efficienti e complessi, che possono eventualmente rappresentare anche categorie di dispositivi particolari, come la rete.
+
+## 4. Stream di bytes
+
+Il **canale di input a byte** è rappresentato dalla classe base **InputStream**. Il suo *costruttore apre lo stream*, il metodo *read legge uno o più byte* e *close chiude lo stream*. Inputstream è una **classe astratta**, dato che read non è definita al suo interno ma bensì dalle sue classi figlie.
+
+Il **canale di output a byte** è invece rappresentato da **OutputStream**, il cui funzionamento è analogo ad inputStream: Il *costruttore apre lo stream*, *write* fa *scrivere uno o più byte*, *flush svuota il buffer* in uscita e *close chiude lo stream*. Anche OutputStream è **astratta**, write infatti andrà implementata dalle suo classi derivate.
+
+### Input e output da file
+
+La classe concreta **FileInputStream** estende InputStream e *implementa write per estrarre dati in binario da un file*. Il suo costruttore prende come parametro una *stringa contenente il percorso del file* da aprire o un *oggetto File* corrispondente al file e *lancia l'eccezione* a controllo obbligatorio `FileNotFoundException`. <br>Il metodo *read legge un byte alla volta*, restituendolo come *int compreso tra 0 e 255*. Se lo *stream è finito*, restituisce *-1*. Lancia l'eccezione `IOException` a controllo obbligatorio.
+
+La classe **FileOutputStream** è la relativa *implementazione di OutputStream* per gestire l'*output di dati su un file*. Il suo funzionamento è analogo a FileInputStream, con write che scrive sul file un byte alla volta, codificato come intero da 0 a 255. In write è possibile poi *inserire un flag boolean* per specificare se *i dati devono essere appesi* o devono sovrascrivere.
+
+### Adapter streams
+
+Gli adapter stream sono classi che adattono uno stream già esistente per aggiungere funzionalità. La loro caratteristica in comune è il costruttore che accetta un InputStream o OutputStream.
+
+Per l'input binario alcuni adapter notevoli sono:
+- DataInputStream: implementa DataInput e definisce vari metodi per leggere valori corrispondenti ai tipi primitivi, utilizzando i wrapper (readInteger(), readFloat() ecc.), che lanciano l'espressione `EOFException` se lo stream termina in modo particolare.
+- ObjectInputStream: implementa DataInput e ObjectInput e definisce il metodo readObject() per poter leggere un oggetto serializzabile. Mantiene anche i metodi di DataInputStream. Tutti i metodi lanciano l'espressione `EOFException` se lo stream termina in modo particolare.
+
+Per l'output binario esistono gli analoghi adapter DataOutputStream e ObjectOutputStream, che seguono lo stesso principio di funzionamento di quelli per l'input.
+
+#### Esempio: scrittura di dati su file
+```java
+import java.io.*;
+public class Esempio1 {
+    public static void main(String args[]){
+        FileOutputStream fs = null;
+    
+        try {
+            fs = new FileOutputStream("Prova.dat");
+        }
+        catch(IOException e){
+            System.out.println("Apertura fallita");
+        System.exit(1);
+        }
+
+        DataOutputStream os =
+        new DataOutputStream(fs);
+        float f1 = 3.1415F; char c1 = 'X';
+        boolean b1 = true; double d1 = 1.4142;
+        try {
+            os.writeFloat(f1); os.writeBoolean(b1);
+            os.writeDouble(d1); os.writeChar(c1);
+            os.writeInt(12); os.close();
+        } catch (IOException e){
+            System.out.println("Scrittura fallita");
+            System.exit(2);
+        }
+    }
+}
+```
+
+## 5. Serializzazione di oggetti
+
+Serializzare un oggetto significa salvarlo in una rappresentazione binaria, deserializzarlo invece significa ricostruirlo partendo da questa rappresentazione. In molti casi è utile e necessario poter salvare interi oggetti per poi successivamente ricostruirli, tuttavia occorre prestare attenzione alle informazioni contenute da questi oggetti perchè dal momento che vengono inseriti nello stream perdono il controllo della JVM e ciò non è sempre opportuno.
+Per poter marcare una classe come serializzabile, questa deve implementare l'interfaccia **Serializable**.
+
