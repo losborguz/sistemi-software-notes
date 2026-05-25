@@ -93,6 +93,89 @@ public class Esempio1 {
 
 ## 5. Serializzazione di oggetti
 
-Serializzare un oggetto significa salvarlo in una rappresentazione binaria, deserializzarlo invece significa ricostruirlo partendo da questa rappresentazione. In molti casi è utile e necessario poter salvare interi oggetti per poi successivamente ricostruirli, tuttavia occorre prestare attenzione alle informazioni contenute da questi oggetti perchè dal momento che vengono inseriti nello stream perdono il controllo della JVM e ciò non è sempre opportuno.
-Per poter marcare una classe come serializzabile, questa deve implementare l'interfaccia **Serializable**.
+Serializzare un oggetto significa *salvarlo in una rappresentazione binaria*, deserializzarlo invece significa *ricostruirlo partendo da questa rappresentazione*. In molti casi è utile e necessario poter salvare interi oggetti per poi successivamente ricostruirli, tuttavia occorre prestare attenzione alle informazioni contenute da questi oggetti perchè dal momento che vengono inseriti nello stream perdono il controllo della JVM e ciò non è sempre opportuno.
+Per poter marcare una classe come serializzabile, questa deve implementare l'interfaccia **Serializable**, un'interfaccia marker che denota solamente la possibilità per gli oggetti della classe che la implementa di essere serializzati e deserializzati. Inoltre in questo caso è buona pratica aggiungere alla classe un numero di versione: il SerialVersionUID. Questa variabile **private, static e final** è un indicatore univoco della versione della classe , che deve essere modificato ogni volta che si cambia la sua struttura.  
+Quando viene riletto un file di oggetti serializzati viene confrontato in automatico il numero di versione dell'oggetto con quello della sua classe e se sono diversi viene lanciata una `InvalidClassException`.  
+Se non dichiarato ne viene creato uno di default calcolato in base ad alcuni dettagli della classe. Tuttavia compilatori diversi potrebbero controllare dettagli diversi e ciò potrebbe portare a eccezioni tirate anche quando non ce n'era bisogno.
 
+```java
+public class 2DPoint implements Serializable {
+    private float x, y;
+    private static final SerialVersionUID = 1;
+
+    //tutti i metodi della classe
+}
+```
+
+### Metodi per serializzare e deserializzare
+
+Nella pratica la scrittura e la lettura di oggetti si applica tramite i due metodi **writeObject()** e **readObject()**. Il primo serializza un oggetto in binario, lanciando un'eccezione se il metodo non implementa Serializable. Il secondo lo ricostruisce, restituendo formalmente un Object e richiedendo quindi un cast alla classe specifica da parte del programmatore.
+
+```java
+2DPoint p = new 2DPoint(3.2F, 1.5F);
+
+try (FileOutputStream f = new FileOutputStream("data.bin")) {
+    ObjectOutputStream os = new ObjectOutputStream(f);
+    os.writeObject(p);
+
+} catch (IOException e) {
+    ...
+}
+
+2DPoint p2 = null;
+try (FineInputStream f = new FineInputStream("data.bin")) {
+    ObjectInputStream os = new ObjectInputStream(f);
+    p2 = (2DPoint) os.readObject(p);
+
+} catch (IOException | ClassNotFoundException e) {
+    ...
+}
+```
+
+**Tip**: quando si vuole salvare una Collection di oggetti, conviene serializzare l'intera collezione piuttosto che ogni singolo oggetto presente, in questo modo la rilettura diventa più facile.
+
+```java
+public static void salvaPunti(String filename, Punto2D[] punti){
+    try {
+        FileOutputStream f = new FileOutputStream(filename);
+        ObjectOutputStream os = new ObjectOutputStream(f);
+        os.writeObject(punti);
+        os.flush(); // non necessaria prima della close
+        os.close();
+    }
+        catch (IOException e){
+        System.err.println("Errore in fase di salvataggio dati");
+    }
+}
+
+public static Punto2D[] leggiPunti(String filename){
+    Punto2D[] punti = null;
+    try {
+        FileInputStream f = new FileInputStream(filename);
+        ObjectInputStream is = new ObjectInputStream(f);
+        punti = (Punto2D[]) is.readObject();
+        is.close();
+    }
+    catch (IOException | ClassNotFoundException e){
+        System.err.println("Errore in fase di rilettura dati");
+    }
+    return punti;
+}
+```
+
+## 6. La stream factory
+
+A partire da Java 7 con la classe **Files** la creazione diretta di stream tramite new ... viene affiancata da un insieme di factory methods per la creazione indiretta. Questi metodi statici hanno signature uniforme new*NomeStream* e come argomenti, oltre all'oggetto Path del file da aprire , hanno un set di OpenOption per indicare le varie opzioni di apertura.
+```java
+newInputStream(Path p, OpenOption... options) //i tre punti ... indicano che possono esserci più elementi di quel tipo.
+newOutputStream(Path p, OpenOption... options) 
+```
+
+## 7. Stream di testo
+
+### Casi d'uso dell'input di testo
+
+Leggere testo da un file è raramente un'operazione a sè stante, molto più spesso è inclusa in un processo più grande di estrazione di informazioni da un file e di creazione di oggetti con quelle informazioni. Le fasi sono le seguenti:
+- Si leggono dal file di testo righe intere di dati, che solitamente corrispondono ad un oggetto di una specifica classe. Questi dati sono strutturati in un modo definito per rappresentare le informazioni.
+- Si analizzano le righe lette e le si spezzettano in varie porzioni corrispondenti alle singole informazioni, come il nome di una linea ferroviaria, le sue fermate ecc.
+- Si usano le informazioni estratte dalle stringhe per costruire oggetti che permettono di rappresentare le entità descritte nel file in maniera più completa.
