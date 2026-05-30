@@ -26,6 +26,11 @@
       - [Esempio 5: larghezza fissa](#esempio-5-larghezza-fissa)
   - [2. Scanner e split()](#2-scanner-e-split)
     - [La classe Scanner](#la-classe-scanner)
+    - [String.split()](#stringsplit)
+      - [splitWithDelimiters](#splitwithdelimiters)
+  - [3. Tokenizzazione di valodi formattati: valori numerici, orari e date](#3-tokenizzazione-di-valodi-formattati-valori-numerici-orari-e-date)
+    - [Stringhe numeriche](#stringhe-numeriche)
+    - [Date e orari](#date-e-orari)
 
 
 ## 1. Introduzione
@@ -362,3 +367,79 @@ Scanner s4 = new Scanner(System.in); //la sorgente è un InputStream (in questo 
 
 Una volta costruito tramite i metodi hasNextXXX si può chiedere allo scanner se il prossimo token è un numero, un boolean o una stringa con formato particolare e successivamente estrarre questo token con nextXXX. Nota che sia il delimitatore che il pattern delle stringhe che può essere eventualmente inserito è denotato tramite regex.  
 Tramite i metodi delimiter e useDelimiter poi si può ottenere e modificare il delimitatore anche successivamente alla costruzione
+
+### String.split()
+
+split è un metodo della classe String che sfrutta Scanner per separare una stringa in vari pezzi in base alla stringa passata come delimitatore. Il metodo è di facile utilizzo e riesce a coprire per bene casi in cui il delimitatore rimane lo stesso, mentre per casi più complessi rimane consigliato l'utilizzo di Scanner.
+
+```java
+String[] parti = line.split("\\s+,\\s+"); //con il \\s+ si escludono dai token anche eventuali spazi tra i separatori
+```
+
+#### splitWithDelimiters
+
+Per casi più particolari esiste anche il metodo splitWithDelimiters. In questo caso la divisione include al suo interno anche i delimitatori, cosa utile per stringhe in cui non ci sono delimitatori espliciti e quindi bisogna separare le parti agendo direttamente sui token. Il metodo ha anche un secondo parametro numerico che tipicamente va lasciato a 0.
+
+```java
+String riga = "nome    parola423423423";
+String[] parti = riga.splitWithDelimiters("\\s+|\\d+", 0); //separi se ci sono 1 o più spazi o 1 o più numeri, includendo nell'array anche quelli
+
+//parti = "nome", "    ", "parola", "423423423"
+```
+
+---
+
+## 3. Tokenizzazione di valodi formattati: valori numerici, orari e date
+
+### Stringhe numeriche
+
+Nei formattatori di `NumberFormat` per valute, numeri e percentuali il metodo `parse(String)` riceve una stringa contenente un valore numerico e lo converte in un oggetto della classe Number, eventualmente verificando la presenza di caratteri particolari come il simbolo di valuta (relativo al Locale specificato durante la creazione del formatter) o il simbolo di percentuale.
+Con i metodi *tipo*Value() di Number poi si possono ottenere i valori in double, int o float.  
+parse può lanciare ParseException, eccezione **a controllo obbligatorio** in caso di problemi durante la conversione, come in caso di formati errati per valori in valuta o percentuali.
+
+```java
+NumberFormat nf = NumberFormat.getNumberInstance(Locale.ITALY); //di default prende il Locale del sistema
+Number number = nf.parse("1.234,55");
+
+NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ITALY);
+Number number = nf.parse("1.234,56 €"); //controlla se c'è l'€ e converte
+
+NumberFormat nf = NumberFormat.getPercentInstance(Locale.ITALY);
+Number number = nf.parse("25,43%"); //controlla se c'è IL % e converte
+
+System.out.println(number.doubleValue()); //1234.56
+System.out.println(number.intValue()); //1234
+```
+
+### Date e orari
+
+Per la conversione di date e orari ci sono due possibili strade che si possono percorrere. Entrambe si basano sull'utilizzo di formattatori per date e orari, che devono essere correttamente configurati in base al pattern che si riceve dalla stringa.  
+
+Il primo modo è utilizzare il formatter per convertire la stringa in un `TemporalAccessor` e inserirlo all'interno del metodo di LocalDate e LocalTime `from()` per generare un oggetto di quel tipo utilizzando il TemporalAccessor.
+
+```java
+//Conversione di una data
+DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.ITALY);
+TemporalAccessor t = df.parse("12/02/23");
+LocalDate d = LocalDate.from(t);
+//chiaramente si può usare anche il relativo per il tempo
+
+//Conversione di una data e ora insieme
+DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.ITALY);
+TemporalAccessor t = dtf.parse("12/02/23, 12:40"); //con questo formato viene convertita sia la data che l'ora
+LocalDate d = LocalDate.from(t); // 12/02/2023
+LocalTime lt = LocaTime.from(t); // 12:40
+LocalDateTime dt = LocalDateTime.from(t) // 12/02/2023, 12:40
+```
+
+Il secondo metodo è utilizzare il metodo `parse()` di LocalTime e LocalDate senza passare per il formatter, che comunque va specificato tra i parametri.
+
+```java
+DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.ITALY);
+
+LocalDateTime dt = LocalDateTime.parse("12/02/23, 12:30", dtf);
+LocalDate d = LocalDate.parse("12/02/23, 12:30", dtf);
+LocalTime t = LocalTime.parse("12/02/23, 12:30", dtf);
+```
+
+---
