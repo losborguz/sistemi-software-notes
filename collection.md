@@ -22,6 +22,7 @@ Per quanto riguarda il **naming** delle classi e interfacce si è adottata quest
 - **Nomi classi** --- implementazioni più specifiche (TreeSet, HashMap, ArrayList...)
 
 In Java il Collection Framework è organizzato come nel grafico sotto.
+
 ![diagramma organizzazione collection](images/collection-organization-java.png)
 
 ## 2. Le interfacce principali del JCF
