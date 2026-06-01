@@ -1,28 +1,10 @@
-# La gestione del tempo, il package `java.time`
-
-## 1. Tipi di rappresentazioni del tempo
-
-Quando indichiamo un concetto relativo al tempo, distinguiamo prima di tutto tra uno **assoluto** e uno **relativo**. Un concetto relativo può essere una **data, un'orario o una combinazione di entrambi** ma sempre **riferiti al luogo in cui si trova chi li esprime**.  
-Un concetto assoluto è un **concetto relativo** del quale però viene indicato anche il luogo in cui bisogna considerarlo: il **fuso orario**, per date e orari.
-
-Inoltre date e orari non sono le uniche cose che usiamo. Periodi di tempo, durate e calendari sono rappresentazioni del tempo che quotidianamente vengono usate.
-
----
-
-## 2. Il package `java.time`
-
-In Java tutti questi concetti vengono modellati da opportune classi contenute nel package `java.time`. I punti cardine del funzionamento delle classi nel package sono l'immutabilità degli oggetti creati (un valore non può essere modificato dopo la sua creazione) e la costruzione sempre indiretta degli oggetti tramite metodi factory.  
-Le classi principali del package sono:
-- LocalDate: data relativa (giorno/mese/anno)
-- LocalTime: orario relativo (ore/minuti/secondi)
-- LocalDateTime: data + orario relativo
-- Period: durata relativa (in giorni, mesi, minuti ecc.)
-- Instant: un instante di tempo sulla linea espresso in nanosecondi e relativo all'UTC
-- Duration: una durata in nanosecondi tra due istanti di tempo
-- OffsetDateTime: data + orario + offset in ore dall'UTC
-- ZonedDateTime: data + orario + fuso orario
-
 # I formattatori e la gestione dell'internazionalizzazione
+
+- [I formattatori e la gestione dell'internazionalizzazione](#i-formattatori-e-la-gestione-dellinternazionalizzazione)
+  - [1. La cultura locale in Java](#1-la-cultura-locale-in-java)
+  - [2. Formattatori numerici](#2-formattatori-numerici)
+    - [Parsing di stringhe](#parsing-di-stringhe)
+
 
 ## 1. La cultura locale in Java
 
