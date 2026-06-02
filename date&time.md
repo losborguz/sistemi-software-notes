@@ -38,6 +38,12 @@ Le classi principali del package sono:
 Gli enumerativi DayOfWeek e Month rappresentano invece i giorni della settimana e i mesi dell'anno. Tramite il metodo `getValue()` viene restituito il corrispondente valore numerico del giorno o del mese, partendo da 1 e non da 0 (in quel caso si può usare `ordinal()`).  
 Tramite il metodo statico `of()` invece si può ottenenere la costante enumerativa dato un valore intero compreso nel range 1-7 o 1-12.
 
+Tramite i metodi `to*` è possibile convertire oggetti che rappresentano in un certo modo un istante in altre rappresentazioni
+```java
+LocalDateTime ldt = LocalDateTime.now();
+Instant i = ldt.toInstant(ZoneOffset.ofHour(1));
+```
+
 ---
 
 ## 3. Date e orari locali
@@ -161,6 +167,6 @@ Tutte domande che richiedono di tenere in considerazione non solo il tempo, ma a
 Le due classi `OffsetDateTime` e `ZonedDateTime` permettono di rappresentare date e orari assoluti indicando o la distanza in ore dall'UTC o il relativo fuso orario. 
 ```java
 LocalDateTime inizio = LocalDateTime.of( 2026, 2, 17, 9, 0);
-OffsetDateTime offsInizio = OffsetDateTime.of(inizio, ZoneOffset.ofHours(1));
-ZonedDateTime zInizio = ZonedDateTime.of( inizio, ZoneId.of("CET"));1
+OffsetDateTime offsInizio = OffsetDateTime.of(inizio, ZoneOffset.ofHours(1)); //specifichi la distanza in ore dall'UTC
+ZonedDateTime zInizio = ZonedDateTime.of( inizio, ZoneId.of("CET")); //specifichi il fuso orario
 ```
