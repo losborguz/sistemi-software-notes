@@ -146,6 +146,7 @@ Per ogni collection sono disponibili tre costruttori:
 - I metodi factory **List.of, Set.of etc.** che creano una collection popolata e immutabile
 
 Di seguito sono riportati alcuni esempi di costruzione di collezioni
+
 ```java
 //Costruzione lista vuota e aggiunta valori
 
