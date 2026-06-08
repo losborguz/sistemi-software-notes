@@ -10,6 +10,7 @@
       - [Aritmetica dei periodi](#aritmetica-dei-periodi)
     - [Instant](#instant)
   - [5. Duration](#5-duration)
+    - [Esempi validi:](#esempi-validi)
   - [6. Date e orari assoluti](#6-date-e-orari-assoluti)
 
 
@@ -145,13 +146,29 @@ Tramite i metodi `plus*`, `minus*` e `with*` si istanziano nuove Duration il cui
 Duration dx = Duration.ofDays(1).plusHours(3).minusMinutes(4).minusSeconds(10);
 ```
 
-I metodi toDays(), toHours(), toMinutes() e gli altri to*() estraggono dalla duration il numero totale di unità di misura indicata nel nome del metodo, **escludendo però la quantità di tempo espressa in unità minori di quella considerata**. In altre parole se si vogliono estrarre le ore da una durata verranno considerati **i giorni e le ore**, mentre i minuti e le grandezze più piccole saranno escluse.
+I metodi `toDays()`, `toHours()`, `toMinutes()` e gli altri to*() estraggono dalla duration il numero totale di unità di misura indicata nel nome del metodo, **escludendo però la quantità di tempo espressa in unità minori di quella considerata**. In altre parole se si vogliono estrarre le ore da una durata verranno considerati **i giorni e le ore**, mentre i minuti e le grandezze più piccole saranno escluse.
 ```
 Durata di 1 giorno + 2 ore + 55 minuti + 50 secondi
 - toHours = 26
 - toMinutes = 26*60+55 = 1615
 - toMillis = (1615*60+50)*1000 = 96950 * 1000
 ```
+
+Inoltre Duration fornisce il metodo `parse()` che permette di convertire una stringa opportunamente formattata in un oggetto della classe. La stringa da passare è del formato ISO 8601, che segue:
+
+- **P** — prefisso obbligatorio. Deve sempre essere presente all'inizio della stringa.
+- **nD** — giorni, opzionale. n è un numero intero (es. 2D = 2 giorni).
+- **T** — separatore obbligatorio se seguono ore, minuti o secondi. Distingue la parte "giorni" dalla parte "tempo".
+- **nH** — ore, opzionale (es. 4H = 4 ore).
+- **nM** — minuti, opzionale (es. 15M = 15 minuti).
+- **n.nS** — secondi, opzionale, supporta i decimali per i millisecondi (es. 30.5S = 30 secondi e mezzo).
+
+### Esempi validi:
+
+PT20S → 20 secondi  
+PT1H30M → 1 ora e 30 minuti  
+P2DT4H15M30.5S → 2 giorni, 4 ore, 15 minuti, 30.5 secondi  
+-PT5M → meno 5 minuti (durata negativa)
 
 ---
 

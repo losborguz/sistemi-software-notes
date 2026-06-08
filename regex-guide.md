@@ -17,6 +17,7 @@
     - [9. Escape `\`](#9-escape-)
     - [10. Lookahead e Lookbehind (Asserzioni Zero-Width)](#10-lookahead-e-lookbehind-asserzioni-zero-width)
   - [Esempio Completo: Validazione Email](#esempio-completo-validazione-email)
+  - [Consigli](#consigli)
 
 
 ## Cos'è una Regular Expression?
@@ -299,4 +300,12 @@ public class ValidazioneEmail {
         System.out.println(isEmailValida("utente+tag@mail.org"));     // true
     }
 }
+```
+
+## Consigli
+
+Quando si vuole validare un campo di testo libero che termini con un certo carattere separatore, conviene crearsi una classe con tutti i caratteri tranne quel separatore (SE NON PRESENTE ANCHE COME TESTO NORMALE).
+```text
+[^\t]+ valida tutti i caratteri fino alla prossima tabulazione
+(ANALISI MATEMATICA T-1		) viene validata
 ```
